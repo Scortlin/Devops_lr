@@ -1,0 +1,16 @@
+# Системные файлы
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+*.pyd
+.env
+../.venv
+venv/
+env/
+
+# Данные
+*.csv
+*.xlsx
+*.json

@@ -1,0 +1,80 @@
+# ============================================================
+# docker-compose.yml — Маркетинговая аналитика (ROI)
+# Вариант 7 | Compose V2 (ключ version не используется)
+# ============================================================
+
+services:
+
+  # ---------- 1. База данных PostgreSQL ----------
+  db:
+    image: postgres:16-alpine
+    container_name: marketing_db
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - pg_data:/var/lib/postgresql/data        # именованный том
+    networks:
+      - backend-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    # --- ТЗ: Ограничение размера логов ---
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ---------- 2. ETL-загрузчик (init-контейнер) ----------
+  loader:
+    build:
+      context: ./app
+    container_name: marketing_loader
+    entrypoint: ["python", "loader.py"]          # переопределяем CMD
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy               # ждём healthy БД
+    volumes:
+      - ./data:/data:ro                          # bind mount (только чтение)
+    networks:
+      - backend-network
+    # --- ТЗ: Ограничение размера логов ---
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ---------- 3. Dash Dashboard ----------
+  dashboard:
+    build:
+      context: ./app
+    container_name: marketing_dashboard
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy
+      loader:
+        condition: service_completed_successfully # ждём окончания загрузки
+    ports:
+      - "8050:8050"
+    networks:
+      - backend-network
+    # --- ТЗ: Ограничение размера логов ---
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# ---------- Именованные тома ----------
+volumes:
+  pg_data:
+
+# ---------- Изолированная сеть ----------
+networks:
+  backend-network:
+    driver: bridge

@@ -35,24 +35,24 @@ graph TD
     subgraph K8s_Cluster ["K8s Cluster (Minikube)"]
         
         subgraph Configs ["Конфигурация"]
-            SEC["Secret (пароли БД)"]
-            CM["ConfigMap (настройки)"]
-            SA["ServiceAccount (RBAC)"]
+            SEC["Secret"]
+            CM["ConfigMap"]
+            SA["ServiceAccount"]
         end
 
         subgraph Database ["Слой данных"]
-            PVC["PersistentVolumeClaim (1Gi)"]
+            PVC["PersistentVolumeClaim"]
             DB_POD("PostgreSQL Pod")
-            DB_SVC{"DB Service (ClusterIP)"}
+            DB_SVC{"DB Service"}
         end
 
         subgraph ML_Model ["Слой ML"]
             MODEL_POD("Dash App Pod<br/>(с ML-моделью)")
-            MODEL_SVC{"App Service (NodePort)"}
+            MODEL_SVC{"App Service"}
         end
 
         subgraph Data ["Загрузка"]
-            JOB("Loader Job (ETL)")
+            JOB("Loader Job")
         end
 
         SEC -.-> DB_POD
@@ -358,6 +358,7 @@ spec:
 ![Скриншот](img/photo7.png)
 ![Скриншот работающего приложения в браузере](img/photo4.png)
 ---
+
 
 
 

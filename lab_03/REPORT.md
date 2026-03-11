@@ -65,7 +65,7 @@ graph TD
         DB_POD --- DB_SVC
         JOB -->|Загружает данные| DB_SVC
         MODEL_POD -->|Читает данные| DB_SVC
-        MODEL_POD -.->|Загружает ML-модель| MODEL["ML Model (joblib)"]
+        MODEL_POD -.->|Загружает ML-модель| MODEL["ML Model"]
     end
 
     User(("Аналитик")) -->|Port 30088| MODEL_SVC:::user
@@ -358,6 +358,7 @@ spec:
 ![Скриншот](img/photo7.png)
 ![Скриншот работающего приложения в браузере](img/photo4.png)
 ---
+
 
 
 
